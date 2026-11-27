@@ -128,6 +128,9 @@ textarea{width:100%;min-height:90px;font:12px/1.4 ui-monospace,Menlo,monospace;b
 .pill.dark{background:var(--acc);color:#fff}.pill.dark:hover{background:var(--acc2)}
 .imgslot{position:relative;margin-top:18px;flex:1;min-height:190px;border-radius:18px;overflow:hidden;background:var(--mint)}
 .imgslot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.imgslot.alpha{background:transparent}
+.imgslot img.alpha{object-fit:contain}
+
 .imgslot .ph{position:absolute;inset:0;display:grid;place-items:center;color:var(--acc2)}
 .imgslot .ph svg{width:62%;max-width:260px;height:auto;opacity:.9}
 .toprow.solo .imgslot{min-height:320px}
@@ -146,6 +149,22 @@ textarea{width:100%;min-height:90px;font:12px/1.4 ui-monospace,Menlo,monospace;b
 @media screen and (max-width:620px){.hero{display:flex}.hero .imgslot{margin-top:18px}.ttl h1{font-size:22px}}
 @media screen and (max-width:520px){.kgrid{grid-template-columns:1fr}.kc b{font-size:28px}}
 @media print{ .hero .pill{display:none!important} .toprow{grid-template-columns:1fr 2fr;gap:8px;break-inside:avoid} .kgrid{gap:8px} .kc{padding:8px 10px} .kc b{font-size:18px;margin:6px 0 2px} .hero{padding:10px} .hero h2{font-size:18px} .imgslot{min-height:110px} .hero,.kc{backdrop-filter:none;box-shadow:none;background:#fff;border:1px solid #E1EAE5;border-radius:16px} .brandpill{box-shadow:none} }
+/* Navigation links wie im Dashboard */
+.side{position:fixed;left:16px;top:96px;bottom:16px;width:64px;z-index:40;display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 0;background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.9);border-radius:32px;box-shadow:var(--sh)}
+.side .sp{flex:1}
+.nv{width:44px;height:44px;border-radius:50%;border:none;background:none;color:#5F6F69;display:grid;place-items:center;padding:0;cursor:pointer;transition:background .15s,color .15s}
+.nv svg{width:20px;height:20px}
+.nv:hover{background:var(--mint);color:var(--acc)}
+.nv[aria-pressed=true]{background:var(--acc);color:#fff}
+.side .nv{background:none;border:none;box-shadow:none;color:#5F6F69}.side .nv:hover{background:var(--mint);color:var(--acc)}.side .nv[aria-pressed=true]{background:var(--acc);color:#fff}
+main{padding-left:129px!important;max-width:none!important}
+header{padding-left:24px!important}
+html{scroll-behavior:smooth}
+.card,.toprow,.dgrid{scroll-margin-top:96px}
+#toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--acc);color:#fff;padding:11px 18px;border-radius:999px;font-size:13.5px;box-shadow:var(--sh);transition:.2s;z-index:200}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+@media screen and (max-width:760px){.side{top:auto;bottom:12px;left:12px;right:12px;width:auto;height:64px;flex-direction:row;justify-content:space-around;padding:0 8px;border-radius:24px}.side .sp{display:none}main{padding:4px 16px 100px!important}#toast{bottom:90px}}
+@media print{ body>*{display:none!important} body::before{content:"Drucken ist für diese Seite nicht freigegeben.";display:block;padding:40px;font:16px Inter,sans-serif;color:#1D2A26} }
 </style></head><body>
 <header><span class="brandpill"><svg class="logo" role="img" aria-label="Achim Bau" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 242.1 78.1" fill="currentColor"><g id="Layer_1">
 	<rect x="1" y="1.8" width="73.4" height="75.7" fill="#B3261E"/>
@@ -420,21 +439,38 @@ function heroHTML(){ const sec=P.sec, T=C.TOT, g=S.g, ref=sec.ref==="bis"?4:3, k
     if(sec.liste&&P.inp) cust.push(kc("pen","Ihre Summe","–","Noch keine Preise eingetragen",{bid:"k_you",sid:"k_you2"}));
     if(!cards.length) cards.push(...cust.slice(0,6)); else cards.push(...cust.filter((x,i)=>sec.tl?i>=1&&i<=3:i===1)); }
   const kg=cards.length?`<div class="kgrid">${cards.join("")}</div>`:"";
-  return `<div class="toprow${kg?"":" solo"}"><div class="hero"><h2>${esc(P.t).replace(" ","<br>")}</h2><p class="hs">${esc(P.hs||("Achim Bau · "+(P.ort||"")))}<br>Stand ${new Date(P.d).toLocaleDateString("de-DE")}</p>`+
+  return `<div class="toprow${kg?"":" solo"}" id="ov"><div class="hero"><h2>${esc(P.t).replace(" ","<br>")}</h2><p class="hs">${esc(P.hs||("Achim Bau · "+(P.ort||"")))}<br>Stand ${new Date(P.d).toLocaleDateString("de-DE")}</p>`+
     (go?`<button class="pill dark" data-goto="${go[0]}">${go[1]} <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M9 7h8v8"/></svg></button>`:"")+
-    `<div class="imgslot">${P.img?`<img src="${P.img}" alt="Projektbild">`:`<div class="ph">${HOUSE}</div>`}</div></div>${kg}</div>`; }
+    `<div class="imgslot${/^data:image\/(png|webp|gif)/.test(P.img||"")?" alpha":""}">${P.img?`<img src="${P.img}" alt="Projektbild"${/^data:image\/(png|webp|gif)/.test(P.img)?' class="alpha"':""}>`:`<div class="ph">${HOUSE}</div>`}</div></div>${kg}</div>`; }
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-goto]"); if(!b) return; const el=document.getElementById(b.dataset.goto); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); });
-// Titel oben folgt dem Abschnitt im Blick (wie im Dashboard)
-function spyTitle(){ const L=[["m","Übersicht"],["s_tl","Projektablauf"],["s_liste",P.inp?"Preisabfrage":"Leistungsliste"],["s_ueb","Summen je Gewerk"],["reply","Ihr Antwort-Link"]].map(([id,l])=>[document.getElementById(id),l]).filter(x=>x[0]);
-  const h=document.getElementById("title"); const on=()=>{ let cur="Übersicht"; L.forEach(([el,l])=>{ if(el.id!=="m"&&el.offsetParent&&el.getBoundingClientRect().top<140) cur=l; }); if(h.textContent!==cur) h.textContent=cur; };
-  addEventListener("scroll",on,{passive:true}); on(); }
+// Navigation links (One-Pager) wie im Dashboard
+const NI={ov:'<rect x="4" y="4" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="2"/>',
+  s_tl:'<rect x="4" y="5.5" width="16" height="14" rx="3"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>',s_liste:'<rect x="5" y="3.5" width="14" height="17" rx="2.5"/><path d="M9 8.5h6M9 12h6M9 15.5h4"/>',
+  s_ueb:'<path d="M5 19V11M10 19V6M15 19v-5M20 19V9"/>',dg:'<path d="M4 19h16"/><path d="M6.5 15l4-4.5 3 3L19 7"/>',s_kalk:'<rect x="5" y="3.5" width="14" height="17" rx="2.5"/><path d="M8.5 7.5h7M8.5 11.5h1M12 11.5h1M15.5 11.5h0M8.5 15h1M12 15h1M15.5 15h0"/>',
+  s_res:'<path d="M17 6.5A6.5 6.5 0 1 0 17 17.5"/><path d="M4 10.5h9M4 13.5h9"/>',reply:'<path d="M4 12l16-7-6 15-3-6z"/><path d="M11 14l9-9"/>'};
+function buildNav(){ const L=[["ov","Übersicht"],["s_tl","Projektablauf"],["s_liste",P.inp?"Preisabfrage":"Leistungsliste"],["s_ueb","Summen je Gewerk"],["dg","Diagramme"],["s_kalk","Kalkulation"],["s_res","Ergebnis"],["reply","Antwort senden"]].filter(([id])=>document.getElementById(id));
+  const ic=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  const a=document.createElement("aside"); a.className="side"; a.setAttribute("aria-label","Navigation");
+  a.innerHTML=L.filter(x=>x[0]!=="reply").map(([id,l])=>`<button class="nv" data-goto="${id}" data-tip="${l}" aria-label="${l}">${ic(NI[id])}</button>`).join("")+`<span class="sp"></span>`+
+    (P.inp?`<button class="nv" id="nv_save" data-tip="Speichern: Ihre Preise bleiben in diesem Browser gespeichert" aria-label="Speichern">${ic('<path d="M5 4.5h11l3 3V19.5H5z"/><path d="M8 4.5v5h7v-5M8 19.5v-6h8v6"/>')}</button><button class="nv" data-goto="reply" data-tip="Antwort an Achim Bau senden" aria-label="Antwort senden">${ic(NI.reply)}</button>`:"");
+  document.body.insertBefore(a,document.body.firstChild);
+  const spy=()=>{ const navs=[...a.querySelectorAll(".nv[data-goto]")]; let cur=navs[0];
+    navs.forEach(n=>{ const el=document.getElementById(n.dataset.goto); if(el&&el.offsetParent!==null&&el.getBoundingClientRect().top<=innerHeight*0.35) cur=n; });
+    if(innerHeight+scrollY>=document.documentElement.scrollHeight-4) cur=navs[navs.length-1];
+    navs.forEach(n=>n.setAttribute("aria-pressed",n===cur?"true":"false"));
+    const h=document.getElementById("title"); if(cur&&h.textContent!==cur.dataset.tip) h.textContent=cur.dataset.tip==="Antwort an Achim Bau senden"?"Antwort senden":cur.dataset.tip; };
+  let raf=0; addEventListener("scroll",()=>{ if(raf) return; raf=requestAnimationFrame(()=>{ raf=0; spy(); }); },{passive:true}); spy();
+  const sv=document.getElementById("nv_save"); if(sv) sv.onclick=()=>{ persist(); toast("Gespeichert. Ihre Preise bleiben in diesem Browser, auch nach dem Schließen."); }; }
+function toast(m){ let t=document.getElementById("toast"); if(!t){ t=document.createElement("div"); t.id="toast"; document.body.appendChild(t); } t.textContent=m; t.classList.add("on"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("on"),2600); }
+// Drucken ist für Empfänger gesperrt
+addEventListener("keydown",e=>{ if((e.ctrlKey||e.metaKey)&&(e.key==="p"||e.key==="P")){ e.preventDefault(); toast("Drucken ist für diese Seite nicht freigegeben."); } },true);
 function build(){
   const sec=P.sec, T=C.TOT, g=S.g, ref=sec.ref==="bis"?4:3, k=Math.max(1,g.PKOEPFE||3);
   let h=heroHTML();
   if(sec.tl) h+=card("s_tl","G","Projektablauf",`<p class="dn" style="margin-top:0">Startdatum eintragen, alle Termine rechnen sich neu. Nur Arbeitstage Mo–Fr ohne Feiertage in Bayern.</p><div id="d_tl"></div>`);
   if(sec.liste) h+=card("s_liste","01","Leistungsliste"+(P.inp?" mit Preisvergleich":""),(P.inp?`<div class="card hero" style="box-shadow:none;margin-bottom:16px"><div class="steps"><span><b>1</b>In der blauen Spalte Ihren Preis je Einheit eintragen</span><span><b>2</b>Name eintragen</span><span><b>3</b>Antwort-Link erstellen und an uns schicken</span></div>
       <div class="who" style="margin:0"><label>Ihr Name / Firma<input id="who" placeholder="z. B. Max Muster, Muster GmbH" autocomplete="organization"></label><div class="dn" id="cnt"></div></div></div>`:"")+
-      `<div class="tw"><table id="t"></table></div>`+(P.inp?`<div class="actions"><button class="pri" id="mk">Antwort-Link erstellen</button><button id="csv">Als CSV herunterladen</button><button onclick="print()">Drucken / PDF</button></div>`:`<div class="actions"><button id="csv">Als CSV herunterladen</button><button onclick="print()">Drucken / PDF</button></div>`),"flow");
+      `<div class="tw"><table id="t"></table></div>`+(P.inp?`<div class="actions"><button class="pri" id="mk">Antwort-Link erstellen</button></div>`:`<div class="actions"></div>`),"flow");
   if(sec.liste&&P.inp) h+=`<div id="reply" class="card"><h2><i>02</i>Ihr Antwort-Link</h2><p>Bitte diesen Link an Achim Bau schicken. Er enthält nur Ihre eingetragenen Preise.</p><textarea readonly id="rl"></textarea><div class="actions" style="margin-top:0"><button class="pri" id="cp">Link kopieren</button><a class="btn" id="mail" href="#">Per E-Mail senden</a></div></div>`;
   if(sec.ueb&&P.ueb) h+=card("s_ueb","","Summen je Gewerk",barsH(P.ueb.map(([l,v])=>({l,v})).sort((a,b)=>b.v-a.v),{labelW:170})+`<p class="dn">${sec.ref==="bis"?"Preise inkl. Provision":"Unsere Preise"}, netto, nur Fest-Positionen.</p>`);
   const ch=[];
@@ -444,17 +480,17 @@ function build(){
   if(sec.D&&C.LK!=null){ const prov=provOf(T,4), gew=T[4]-prov-C.LK-C.SK; ch.push(card("c_d","D","Umsatz und Gewinn je Gewerk",gewerkProfit(gew,prov))); }
   if(sec.E) ch.push(card("c_e","E","Arbeitsstunden je Gewerk: Soll und Ist",sollIst()));
   if(sec.F) ch.push(card("c_f","F","Unser Preis im Marktvergleich je Gewerk",`<p class="dn" style="margin-top:0">Heller Balken = Marktspanne Min–Max, Kreis = Ø Bayreuth, grüner Punkt = unser Preis.</p>`+rangePlot(P.o.filter(x=>C.SUB[x][3]>0).map(x=>{const s=C.SUB[x];return {l:x,mn:s[0],mx:s[1],bt:s[2],von:s[3],bis:s[4]};})),"wide"));
-  if(ch.length) h+=`<div class="dgrid">${ch.join("")}</div>`;
+  if(ch.length) h+=`<div class="dgrid" id="dg">${ch.join("")}</div>`;
   if(sec.kalk&&P.kalk) h+=card("s_kalk","","Kalkulation",`<div class="kgrid3">${P.kalk.map(([t,rows])=>`<div><h4 style="margin:0 0 6px;font-weight:500">${esc(t)}</h4>${rows.map(r=>`<div class="kv"><span>${esc(r[0])}</span><b>${esc(r[1])}</b><span>${esc(r[2])}</span></div>`).join("")}</div>`).join("")}</div>`);
   if(sec.res&&P.res) h+=card("s_res","05","Einnahmen − Kosten = Gewinn je Preisansatz",`<div style="overflow:auto"><table class="res">${P.res.map((r,i)=>`<tr>${r.map((c,j)=>i===0?`<th class="${j?"n":""}">${esc(c)}</th>`:`<td class="${j?"n":""}">${esc(c)}</td>`).join("")}</tr>`).join("")}</table></div>`,"flow");
   document.getElementById("m").innerHTML=h;
   if(sec.tl){ renderTL(); kpiTL(); }
-  if(sec.liste){ document.getElementById("srch").style.display=""; render(); if(P.inp) wire(); document.getElementById("csv").onclick=csv; }
+  if(sec.liste){ document.getElementById("srch").style.display=""; render(); if(P.inp) wire(); const cb=document.getElementById("csv"); if(cb) cb.onclick=csv; }
 }
 function kpiTL(){ const a=document.getElementById("k_fin"); if(!a) return; const R=tlCalc(), L=Object.values(R).filter(x=>!x.skip), pEnd=new Date(Math.max(...L.map(x=>x.pE)));
   a.textContent=pEnd.toLocaleDateString("de-DE"); document.getElementById("k_fin2").textContent="bei Start am "+pd(S.tl.start).toLocaleDateString("de-DE");
   const ks=document.getElementById("k_st"); if(ks) ks.textContent=nextWd(pd(S.tl.start)).toLocaleDateString("de-DE");
-  const st=nextWd(pd(S.tl.start)), wk=Math.ceil((wdBetween(st,pEnd)+1)/5), bz=document.getElementById("k_bz"); if(bz) bz.textContent="ca. "+wk+" Wochen";
+  const st=nextWd(pd(S.tl.start)), wk=Math.ceil((wdBetween(st,pEnd)+1)/5), bz=document.getElementById("k_bz"); if(bz) bz.textContent=wk+" Wochen";
   const dry=L.find(x=>x.fix), e=document.getElementById("k_end"); if(e) e.textContent=L.length+" Bauphasen"+(dry?" · inkl. "+dry.days+" Arbeitstage Estrich-Trocknung":""); }
 document.addEventListener("change",e=>{ if(e.target.dataset&&e.target.dataset.tl) setTimeout(kpiTL,0); });
 document.addEventListener("click",e=>{ if(e.target.closest('[data-tl="reset"]')){ S.tl=JSON.parse(JSON.stringify(P.tl||{start:"",ph:{}})); persist(); renderTL(); kpiTL(); } },true);
@@ -521,5 +557,5 @@ window.addEventListener("beforeprint",fit); window.addEventListener("afterprint"
   if(P.ih) Object.entries(P.ih).forEach(([x,[ih,n,soll]])=>{ if(C.SUB[x]){ C.SUB[x].ih=ih; C.SUB[x].ihn=n; C.SUB[x].ihSoll=soll; } });
   S.tl=ST.tl||(P.tl?JSON.parse(JSON.stringify(P.tl)):null);
   document.getElementById("subt").textContent=`${P.t} · ${P.ort||""} · netto, nur Lohn`;
-  build(); spyTitle(); })();
+  build(); buildNav(); })();
 </script></body></html>
