@@ -262,6 +262,9 @@ const PH=[ // id, Name, Gewerke (Stunden), Vorgänger, ohne Arbeit (Trocknung)
   ["ft","Fensterbänke & Türen",["Fensterbänke & Türen"],["bo"]],
   ["ba","Baustelle, Reinigung & Übergabe",["Baustelle","Regiestunden"],["ft"]],
 ];
+const PHDEF={}; PH.forEach(p=>p[2].forEach(x=>PHDEF[x]=p[0]));
+const phOf=x=>(window.GPH&&window.GPH[x])||PHDEF[x]||"ba"; // Kategorie -> Phase (eigene Kategorien wählbar)
+const gwsOf=id=>Object.keys(C.SUB||{}).filter(x=>phOf(x)===id);
 const DAY=864e5, iso=d=>{ const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4); return z.toISOString().slice(0,10); };
 const pd=s=>{ if(!s) return null; const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); };
 const HOL={}; function hol(y){ if(HOL[y]) return HOL[y]; // gesetzliche Feiertage Bayern (ohne Mariä Himmelfahrt)
@@ -277,7 +280,7 @@ const fd=d=>d?d.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"
 function tlState(){ if(!S.tl){ const d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()+((8-d.getDay())%7||7)); S.tl={start:iso(d),ph:{}}; } S.tl.ph=S.tl.ph||{}; return S.tl; }
 function tlCalc(){
   const tl=tlState(), g=S.g, cap=g.MA*g.SPT, out={}, start=nextWd(pd(tl.start)||new Date());
-  PH.forEach(([id,name,gws,dep,fix])=>{ const p=tl.ph[id]||{};
+  PH.forEach(([id,name,,dep,fix])=>{ const p=tl.ph[id]||{}, gws=fix?[]:gwsOf(id);
     const soll=gws.reduce((a,x)=>a+(C.SUB[x]?C.SUB[x][5]:0),0)*(1+g.RZ), ist=gws.reduce((a,x)=>a+(C.SUB[x]&&C.SUB[x].ihn?C.SUB[x].ih:0),0), istN=gws.reduce((a,x)=>a+(C.SUB[x]?C.SUB[x].ihn:0),0), ref=gws.reduce((a,x)=>a+(C.SUB[x]?C.SUB[x].ihSoll:0),0)*(1+g.RZ);
     const auto=fix||Math.max(1,Math.ceil(soll/Math.max(1,cap)-1e-9)), days=p.d>0?p.d:auto;
     if(!fix&&soll<=0&&!(p.d>0)) { out[id]={id,name,skip:true}; return; }
@@ -456,7 +459,7 @@ window.addEventListener("beforeprint",fit); window.addEventListener("afterprint"
   if(P.v===1){ P={v:2,t:P.t,d:P.d,o:P.o,sec:{liste:1,inp:1,ref:"von"},g:{},C:{TOT:[0,0,0,0,0],SUB:{},WV:0},c:P.c.filter(c=>c[0]!=="von"),r:P.r.map(r=>{ const vi=P.c.findIndex(c=>c[0]==="von"); const vals=r.slice(6); return [...r.slice(0,6),vi>=0?vals[vi]:0,...vals.filter((v,j)=>j!==vi)]; }),art:P.art,menge:P.menge,einheit:P.einheit,inp:1,refName:"Unser Preis €/E"}; }
   KEYS="preisabfrage_"+m[1].slice(-24);
   try{ const s=JSON.parse(localStorage.getItem(KEYS)); if(s&&s.p) ST=s; }catch(e){}
-  S.g=P.g||{}; C=P.C||{}; DATA.order=P.o||[]; P.inp=P.sec.liste?P.inp:0;
+  S.g=P.g||{}; C=P.C||{}; DATA.order=P.o||[]; window.GPH=P.gph||{}; P.inp=P.sec.liste?P.inp:0;
   if(P.ih) Object.entries(P.ih).forEach(([x,[ih,n,soll]])=>{ if(C.SUB[x]){ C.SUB[x].ih=ih; C.SUB[x].ihn=n; C.SUB[x].ihSoll=soll; } });
   S.tl=ST.tl||(P.tl?JSON.parse(JSON.stringify(P.tl)):null);
   document.getElementById("title").innerHTML=`<span>${P.sec.liste&&P.inp?"Preisabfrage":"Projektbericht"}</span> <b>${esc(P.t)}</b>`;
