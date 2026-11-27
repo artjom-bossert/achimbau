@@ -1,47 +1,92 @@
 <!doctype html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><title>Preisabfrage · Achim Bau</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--red:#B3261E;--ink:#1F1B1A;--muted:#7A706D;--line:#E5DEDB;--in:#F7F0EF;--inb:#B9ADA9}
+:root{--ink:#1D2A26;--muted:#7C8A85;--line:#E4ECE8;--acc:#1F4D40;--acc2:#2F6B57;--mint:#E5F0EB;--in:#F1F6F3;--inb:#D6E3DC;--red:#C2453D;--card:rgba(255,255,255,.8);--sh:0 1px 2px rgba(22,52,42,.04),0 12px 32px rgba(22,52,42,.06)}
 *{box-sizing:border-box}
-body{margin:0;font:13.5px/1.45 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
-.bar{background:var(--red);color:#fff;display:flex;align-items:center;gap:16px;padding:12px 24px;position:sticky;top:0;z-index:10}
-.logo{height:38px;width:auto}.bdiv{width:1px;height:36px;background:rgba(255,255,255,.35)}
-.bar h1{font-size:18px;font-weight:600;margin:0}.bar .sub{font-size:12px;opacity:.8}
-main{padding:24px 24px 80px;max-width:100%}
-h2{font-size:16px;font-weight:600;margin:0 0 8px;padding-bottom:8px;border-bottom:1px solid var(--ink);display:flex;gap:10px;align-items:baseline}
-h2 i{font-style:normal;font-weight:400;color:var(--red)}
-.intro{max-width:820px;margin:0 0 22px;color:#3A3331}
-.who{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;margin:0 0 22px}
-.who label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
-input{font:inherit;color:var(--ink);font-weight:600;background:var(--in);border:none;border-bottom:1px solid var(--inb);border-radius:0;padding:5px 8px;text-align:right}
-input:focus{outline:none;background:#fff;border-bottom:2px solid var(--red)}
-.who input{text-align:left;width:260px}
-.tw{overflow:auto;border-top:1px solid var(--ink);max-height:72vh}
+html{background:#EEF4F1}
+body{margin:0;min-height:100vh;color:var(--ink);font:13.5px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased;
+  background:radial-gradient(1100px 520px at 12% -8%,#DCEBE3 0%,rgba(220,235,227,0) 62%),radial-gradient(900px 500px at 100% 0%,#E9F2EE 0%,rgba(233,242,238,0) 60%),linear-gradient(180deg,#EEF4F1 0%,#F5F9F7 100%) fixed}
+header{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:22px;padding:16px 28px 14px;background:linear-gradient(180deg,rgba(238,244,241,.94),rgba(240,246,243,.82));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.logo{height:30px;width:auto;color:var(--ink);flex:none}
+header h1{font-size:27px;font-weight:500;letter-spacing:-.02em;margin:0;line-height:1.15}
+header .sub{margin:3px 0 0;font-style:italic;color:var(--muted);font-size:14px}
+main{padding:6px 28px 64px;max-width:1500px;margin:0 auto}
+.card{background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.9);border-radius:22px;box-shadow:var(--sh);padding:22px 24px;margin-bottom:20px}
+h2{font-size:17px;font-weight:500;letter-spacing:-.01em;margin:0 0 14px;display:flex;align-items:center;gap:10px}
+h2 i{font-style:normal;font-size:11px;font-weight:600;color:var(--acc2);background:var(--mint);border-radius:999px;padding:3px 9px;line-height:1.3}
+.top{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr);gap:20px;margin-bottom:20px}
+.hero{background:linear-gradient(160deg,#D9EAE1 0%,#EEF6F2 55%,rgba(255,255,255,.85) 100%);margin:0;padding:26px 26px 22px}
+.hero h3{font-size:30px;font-weight:500;line-height:1.12;letter-spacing:-.025em;margin:0 0 10px}
+.intro{margin:0 0 18px;color:#3F4F49;max-width:640px;line-height:1.6}
+.steps{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+.steps span{background:rgba(255,255,255,.85);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:500}
+.steps b{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--acc);color:#fff;font-size:11px;margin-right:6px}
+.who{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:end}
+.who label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:#5F6F69}
+.kc{margin:0;display:flex;flex-direction:column}
+.kc h4{margin:0;font-size:17px;font-weight:500}
+.kc .big{font-size:40px;font-weight:500;letter-spacing:-.03em;line-height:1.05;margin:auto 0 6px;padding-top:30px;font-variant-numeric:tabular-nums}
+.kc .big.acc{color:var(--acc2)}
+.kc small{color:var(--muted);font-size:12.5px}
+input{font:inherit;color:var(--ink);font-weight:500;background:var(--in);border:1px solid transparent;border-radius:10px;padding:7px 10px;text-align:left;transition:border-color .15s,box-shadow .15s}
+input:hover{border-color:var(--inb)}
+input:focus{outline:none;background:#fff;border-color:var(--acc2);box-shadow:0 0 0 3px rgba(47,107,87,.14)}
+input::placeholder{color:#97A49F;font-weight:400}
+.who input{width:300px;background:#fff}
+.tw{overflow:auto;border:1px solid #EAF1ED;border-radius:14px;background:#fff;max-height:72vh}
 table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%}
-th,td{padding:5px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
-thead th{position:sticky;top:0;background:#fff;font-size:11px;font-weight:600;border-bottom:1px solid var(--ink);vertical-align:bottom;white-space:normal;z-index:2}
-th.you,td.you{background:#FBF3F2}
-thead th.you{background:#F6E4E2;color:var(--red)}
+th,td{padding:6px 9px;border-bottom:1px solid #EFF4F1;white-space:nowrap}
+thead th{position:sticky;top:0;background:#F7FAF8;color:#5F6F69;font-size:11.5px;font-weight:500;border-bottom:1px solid var(--line);vertical-align:bottom;white-space:normal;z-index:2}
+th.you,td.you{background:#F3F8F5}
+thead th.you{background:var(--mint);color:var(--acc2);font-weight:600}
 td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
-td.name{white-space:normal;min-width:260px;max-width:380px}
-tr.gh td{font-weight:600;font-size:14px;padding-top:14px;border-bottom:1px solid var(--ink);background:#fff}
-tr.gh td:first-child{color:var(--red);font-weight:400}
-tr.sub td{font-weight:600;border-bottom:1px solid var(--ink)}
-tr.tot td{background:var(--in);font-weight:700;font-size:14.5px;border-top:2px solid var(--ink)}
+td.name{white-space:normal;min-width:260px;max-width:400px}
+tr.gh td{font-weight:500;font-size:14px;padding-top:12px;padding-bottom:8px;background:#F3F8F5;border-bottom:1px solid #E6EFEA}
+tr.gh td:first-child{color:var(--acc2)}
+tr.sub td{font-weight:600;background:#FAFCFB;border-bottom:1px solid #E6EFEA}
+tr.sub td.you{background:#EDF5F1}
+tr.tot td{background:var(--mint);font-weight:600;font-size:14.5px}
 tr.opt td.name{color:var(--muted);font-style:italic}
-td input{width:96px}
-.actions{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 8px}
-button,.btn{font:inherit;font-weight:600;border:1px solid var(--ink);background:#fff;color:var(--ink);padding:9px 16px;border-radius:2px;cursor:pointer;text-decoration:none}
-button.pri{background:var(--red);border-color:var(--red);color:#fff}
-textarea{width:100%;min-height:90px;font:12px/1.4 ui-monospace,Menlo,monospace;border:1px solid var(--line);padding:8px;margin:8px 0}
-.muted{color:var(--muted);font-size:12px}
-#reply{display:none;border-top:1px solid var(--ink);padding-top:12px;margin-top:12px;max-width:900px}
-.err{color:var(--red);font-weight:600;margin:40px 0}
-@media print{.bar{position:static}.actions,#reply{display:none}.tw{max-height:none;overflow:visible}input{background:none;border:none}}
+tbody tr:not(.gh):not(.sub):not(.tot):hover td{background:#F5FAF7}
+td input{width:110px;border-radius:8px;padding:5px 9px;background:#fff;border-color:var(--inb)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 0}
+button,.btn{font:inherit;font-weight:500;border:none;background:#fff;color:var(--ink);padding:11px 20px;border-radius:999px;cursor:pointer;text-decoration:none;box-shadow:var(--sh);font-size:14px}
+button:hover,.btn:hover{color:var(--acc)}
+button.pri{background:var(--acc);color:#fff}
+button.pri:hover{background:var(--acc2);color:#fff}
+textarea{width:100%;min-height:90px;font:12px/1.4 ui-monospace,Menlo,monospace;border:1px solid var(--line);border-radius:12px;padding:10px;margin:8px 0;background:#fff}
+.muted{color:var(--muted);font-size:12.5px}
+#reply{display:none}
+.err{color:var(--red);font-weight:500;margin:40px 0}
+.prn{display:none}
+@media screen and (max-width:1000px){.top{grid-template-columns:1fr 1fr}.hero{grid-column:1/-1}}
+@media screen and (max-width:620px){header{padding:14px 16px}main{padding:6px 16px 60px}.top{grid-template-columns:1fr}.who input{width:100%}.who label{width:100%}.hero h3{font-size:24px}}
+@page{size:A4 landscape;margin:8mm}
+@media print{
+  html,body{background:#EEF4F1!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{font-size:11.5px}
+  header{position:static;backdrop-filter:none;background:none;padding:0 0 10px}
+  main{padding:0;max-width:none}
+  .card{backdrop-filter:none;box-shadow:none;background:#fff;border:1px solid #E1EAE5;padding:14px 16px;margin-bottom:12px;break-inside:avoid}
+  .card.list{break-inside:auto}
+  .top{grid-template-columns:1.6fr 1fr 1fr;gap:12px}
+  .hero h3{font-size:22px}
+  .actions,#reply,.steps{display:none!important}
+  .tw{max-height:none;overflow:visible;border:none;border-radius:0}
+  thead{display:table-header-group}
+  thead th{position:static}
+  tr{break-inside:avoid}
+  tr.gh{break-after:avoid}
+  td input{border:none;background:none;padding:0;width:auto}
+  .who input{border:none;background:none;padding:0}
+  .prn{display:inline}
+}
 </style></head><body>
-<div class="bar"><svg class="logo" role="img" aria-label="Achim Bau" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 242.1 78.1" fill="#ffffff"><g id="Layer_1">
-	<rect x="1" y="1.8" width="73.4" height="75.7"/>
+<header><svg class="logo" role="img" aria-label="Achim Bau" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 242.1 78.1" fill="currentColor"><g id="Layer_1">
+	<rect x="1" y="1.8" width="73.4" height="75.7" fill="#B3261E"/>
 	<g>
 		<path d="M107.8,35.6l-1.6-5H94.5l-1.5,5h-9.5L94.4,1.3h11.1l11.3,34.3H107.8L107.8,35.6z M96.7,23.1h6.9l-3.5-11.7L96.7,23.1z"/>
 		<path d="M132.2,36.3c-5.2,0-9.4-1.7-12.8-5.1s-5.1-7.7-5.1-12.8s1.7-9.4,5.1-12.8c3.4-3.4,7.7-5.1,12.8-5.1c3.1,0,6,0.7,8.6,2.2
@@ -66,14 +111,21 @@ textarea{width:100%;min-height:90px;font:12px/1.4 ui-monospace,Menlo,monospace;b
 		l1.4,2.4L237.1,9.4L237.1,9.4z M235.1,4.3V6h1.1c0.2,0,0.4-0.1,0.5-0.2s0.2-0.4,0.2-0.6s-0.1-0.4-0.2-0.6s-0.3-0.2-0.5-0.2
 		C236.3,4.3,235.1,4.3,235.1,4.3z"/>
 </g>
-</svg><span class="bdiv"></span><div><h1 id="title">Preisabfrage</h1><div class="sub">Achim Bau · Leistungsliste · netto, reiner Lohn ohne Material</div></div></div>
+</svg><div><h1 id="title">Preisabfrage</h1><p class="sub">Achim Bau · Leistungsliste · netto, reiner Lohn ohne Material</p></div></header>
 <main id="m">
-<p class="intro">Hallo, hier ist unsere Leistungsliste. Bitte tragen Sie in der rot markierten Spalte ganz rechts <b>Ihren Preis je Einheit</b> ein. Den Gesamtpreis rechnen wir automatisch (Menge × Preis). Felder können leer bleiben. Zum Schluss auf <b>„Antwort-Link erstellen“</b> klicken und uns den Link schicken, z. B. per WhatsApp oder E-Mail. Ihre Eingaben bleiben in diesem Browser gespeichert, bis Sie fertig sind.</p>
-<div class="who"><label>Ihr Name / Firma<input id="who" placeholder="z. B. Max Muster, Muster GmbH" autocomplete="organization"></label><div class="muted" id="stand"></div></div>
-<h2><i>01</i>Leistungsliste</h2>
+<div class="top">
+  <div class="card hero"><h3>Ihre Preise für unsere<br>Leistungsliste</h3>
+    <p class="intro">Bitte tragen Sie in der grün markierten Spalte ganz rechts <b>Ihren Preis je Einheit</b> ein. Den Gesamtpreis rechnen wir automatisch (Menge × Preis). Felder dürfen leer bleiben. Ihre Eingaben bleiben in diesem Browser gespeichert, bis Sie fertig sind.</p>
+    <div class="steps"><span><b>1</b>Preise eintragen</span><span><b>2</b>Name eintragen</span><span><b>3</b>Antwort-Link erstellen und an uns schicken</span></div>
+    <div class="who"><label>Ihr Name / Firma<input id="who" placeholder="z. B. Max Muster, Muster GmbH" autocomplete="organization"></label><div class="muted" id="stand"></div></div></div>
+  <div class="card kc"><h4>Ihre Summe</h4><span class="big acc" id="k_sum">–</span><small>netto, nur Fest-Positionen</small></div>
+  <div class="card kc"><h4>Ausgefüllt</h4><span class="big" id="k_cnt">–</span><small id="k_cnt2"></small></div>
+</div>
+<div class="card list"><h2><i>01</i>Leistungsliste</h2>
 <div class="tw"><table id="t"></table></div>
 <div class="actions"><button class="pri" id="mk">Antwort-Link erstellen</button><button id="csv">Als CSV herunterladen</button><button onclick="print()">Drucken / PDF</button></div>
-<div id="reply"><h2><i>02</i>Ihr Antwort-Link</h2><p>Bitte diesen Link an Achim Bau schicken. Er enthält nur Ihre eingetragenen Preise.</p><textarea readonly id="rl"></textarea><div class="actions" style="margin-top:0"><button class="pri" id="cp">Link kopieren</button><a class="btn" id="mail" href="#">Per E-Mail senden</a></div></div>
+</div>
+<div id="reply" class="card"><h2><i>02</i>Ihr Antwort-Link</h2><p>Bitte diesen Link an Achim Bau schicken. Er enthält nur Ihre eingetragenen Preise.</p><textarea readonly id="rl"></textarea><div class="actions" style="margin-top:0"><button class="pri" id="cp">Link kopieren</button><a class="btn" id="mail" href="#">Per E-Mail senden</a></div></div>
 </main>
 <script>
 const b64u=b=>{let s="";b.forEach(x=>s+=String.fromCharCode(x));return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")};
@@ -106,6 +158,9 @@ function upd(){ let tot=0,cnt=0; const sg={};
     if(p!=null){ const gp=R2(q*p); td.textContent=F2.format(gp); if(fest){ tot+=gp; sg[gi]=(sg[gi]||0)+gp; cnt++; } } else td.textContent=""; });
   document.querySelectorAll("[data-sg]").forEach(td=>{ const v=sg[td.dataset.sg]; td.textContent=v?F0.format(v)+" €":""; });
   document.getElementById("gt").textContent=cnt?F0.format(tot)+" €":"";
+  const all=P.r.length, done=P.r.filter(r=>ST.p[r[0]]!=null).length;
+  document.getElementById("k_sum").textContent=cnt?F0.format(tot)+" €":"–";
+  document.getElementById("k_cnt").textContent=done+" / "+all; document.getElementById("k_cnt2").textContent=done===all?"Alle Positionen haben einen Preis":(all-done)+" Positionen noch ohne Preis";
   try{ localStorage.setItem(KEYS,JSON.stringify(ST)); }catch(e){} }
 document.addEventListener("input",e=>{ if(e.target.dataset.i!==undefined){ const v=parse(e.target.value); if(v===null) delete ST.p[e.target.dataset.i]; else ST.p[e.target.dataset.i]=v; upd(); }
   if(e.target.id==="who"){ ST.who=e.target.value; upd(); } });
@@ -131,4 +186,7 @@ document.getElementById("csv").onclick=()=>{ const d=v=>String(typeof v==="numbe
   document.getElementById("title").textContent="Preisabfrage "+P.t;
   document.getElementById("stand").textContent="Stand der Liste: "+new Date(P.d).toLocaleDateString("de-DE");
   document.getElementById("who").value=ST.who||""; render(); })();
+// Druck: Tabelle auf Seitenbreite (A4 quer) verkleinern, damit rechts nichts abgeschnitten wird
+const PW=1060; function fit(){ const t=document.getElementById("t"); if(!t) return; t.style.zoom=1; const w=t.scrollWidth; t.style.zoom=w>PW-34?((PW-34)/w).toFixed(3):1; }
+window.addEventListener("beforeprint",fit); window.addEventListener("afterprint",()=>{ const t=document.getElementById("t"); if(t) t.style.zoom=""; });
 </script></body></html>
