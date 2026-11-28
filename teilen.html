@@ -165,6 +165,9 @@ html{scroll-behavior:smooth}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 @media screen and (max-width:760px){.side{top:auto;bottom:12px;left:12px;right:12px;width:auto;height:64px;flex-direction:row;justify-content:space-around;padding:0 8px;border-radius:24px}.side .sp{display:none}main{padding:4px 16px 100px!important}#toast{bottom:90px}}
 @media print{ body>*{display:none!important} body::before{content:"Drucken ist für diese Seite nicht freigegeben.";display:block;padding:40px;font:16px Inter,sans-serif;color:#1D2A26} }
+td.bm{min-width:240px}
+td.bm textarea{width:100%;min-width:220px;min-height:32px;resize:none;overflow:hidden;font:inherit;font-size:13px;line-height:1.4;border:1px solid #D6E3DC;border-radius:8px;padding:6px 8px;background:#fff;color:var(--ink)}
+td.bm textarea:focus{outline:none;border-color:var(--acc2);box-shadow:0 0 0 3px rgba(47,107,87,.12)}
 </style></head><body>
 <header><span class="brandpill"><svg class="logo" role="img" aria-label="Achim Bau" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 242.1 78.1" fill="currentColor"><g id="Layer_1">
 	<rect x="1" y="1.8" width="73.4" height="75.7" fill="#B3261E"/>
@@ -207,7 +210,7 @@ const parse=s=>{s=String(s).trim().replace(/\s|€/g,"");if(!s)return null;if(s.
 const R2=x=>Math.round(x*100)/100;
 
 const e0=v=>F0.format(v)+" €", F1=nf(1), pct=(v,d=0)=>nf(d).format(v*100)+" %";
-let P,KEYS,ST={who:"",p:{},tl:null}, S={g:{},tl:null}, C={}, DATA={order:[]};
+let P,KEYS,ST={who:"",p:{},b:{},tl:null}, S={g:{},tl:null}, C={}, DATA={order:[]};
 window.TL_PUBLIC=true;
 function persist(){ ST.tl=S.tl; try{ localStorage.setItem(KEYS,JSON.stringify(ST)); }catch(e){} }
 // ---------- Diagramme und Timeline (gemeinsam für Rechner und Freigabe-Seite)
@@ -432,7 +435,7 @@ function heroHTML(){ const sec=P.sec, T=C.TOT, g=S.g, ref=sec.ref==="bis"?4:3, k
       kc("up","Gewinn vor Steuern",e0(gew+prov/k),`inkl. ${e0(prov/k)} Provision Achim Bau GbR · Marge ${pct(T[4]>0?gew/T[4]:0,1)}`,{int:1,acc:1}),
       kc("clock","Auslastung Team",pct(C.AUSL||0),`${C.WV} Wochen · ${g.MA} Mitarbeiter · ${C.BEW||""}`,{int:1}),
       kc("box","Arbeitsstunden",F0.format(C.BED||0)+" h",`Mindestdauer ${F1.format(C.MIN||0)} Wo. · bezahlt ${F0.format(C.BEZ||0)} h`,{int:1})); }
-  if(sec.kpi){ const cust=[kc("eur","Angebotssumme netto",e0(T[ref]),`brutto ${e0(T[ref]*1.19)} inkl. 19 % MwSt.`,{acc:1}),
+  if(sec.kpi){ const cust=[USP()||!sec.liste?kc("eur","Angebotssumme netto",e0(T[ref]),`brutto ${e0(T[ref]*1.19)} inkl. 19 % MwSt.`,{acc:1}):kc("tag","Leistungen",String(P.r.filter(r=>r[5]).length),"Positionen zum Ausfüllen in der Preisabfrage"),
       kc("clock","Bauzeit",`${C.WV} Wochen`,sec.tl?"":"Ausbau beider Häuser",{bid:"k_bz",sid:"k_end"})];
     if(sec.tl) cust.push(kc("cal","Baustart","–","Im Projektablauf änderbar",{bid:"k_st"}),kc("flag","Fertigstellung","–","",{bid:"k_fin",sid:"k_fin2"}));
     cust.push(kc("layers","Gewerke",String(P.o.length),sec.liste&&P.r?`${P.r.length} Positionen · netto, nur Lohn`:"netto, reiner Lohn ohne Material"));
@@ -468,7 +471,7 @@ function build(){
   const sec=P.sec, T=C.TOT, g=S.g, ref=sec.ref==="bis"?4:3, k=Math.max(1,g.PKOEPFE||3);
   let h=heroHTML();
   if(sec.tl) h+=card("s_tl","G","Projektablauf",`<p class="dn" style="margin-top:0">Startdatum eintragen, alle Termine rechnen sich neu. Nur Arbeitstage Mo–Fr ohne Feiertage in Bayern.</p><div id="d_tl"></div>`);
-  if(sec.liste) h+=card("s_liste","01","Leistungsliste"+(P.inp?" mit Preisvergleich":""),(P.inp?`<div class="card hero" style="box-shadow:none;margin-bottom:16px"><div class="steps"><span><b>1</b>In der blauen Spalte Ihren Preis je Einheit eintragen</span><span><b>2</b>Name eintragen</span><span><b>3</b>Antwort-Link erstellen und an uns schicken</span></div>
+  if(sec.liste) h+=card("s_liste","01","Leistungsliste"+(USP()&&P.inp?" mit Preisvergleich":P.inp?" zum Ausfüllen":""),(P.inp?`<div class="card hero" style="box-shadow:none;margin-bottom:16px"><div class="steps"><span><b>1</b>In der blauen Spalte Ihren Preis je Einheit eintragen, ganz rechts bei Bedarf eine Bemerkung</span><span><b>2</b>Name eintragen</span><span><b>3</b>Antwort-Link erstellen und an uns schicken</span></div>
       <div class="who" style="margin:0"><label>Ihr Name / Firma<input id="who" placeholder="z. B. Max Muster, Muster GmbH" autocomplete="organization"></label><div class="dn" id="cnt"></div></div></div>`:"")+
       `<div class="tw"><table id="t"></table></div>`+(P.inp?`<div class="actions"><button class="pri" id="mk">Antwort-Link erstellen</button></div>`:`<div class="actions"></div>`),"flow");
   if(sec.liste&&P.inp) h+=`<div id="reply" class="card"><h2><i>02</i>Ihr Antwort-Link</h2><p>Bitte diesen Link an Achim Bau schicken. Er enthält nur Ihre eingetragenen Preise.</p><textarea readonly id="rl"></textarea><div class="actions" style="margin-top:0"><button class="pri" id="cp">Link kopieren</button><a class="btn" id="mail" href="#">Per E-Mail senden</a></div></div>`;
@@ -494,32 +497,33 @@ function kpiTL(){ const a=document.getElementById("k_fin"); if(!a) return; const
   const dry=L.find(x=>x.fix), e=document.getElementById("k_end"); if(e) e.textContent=L.length+" Bauphasen"+(dry?" · inkl. "+dry.days+" Arbeitstage Estrich-Trocknung":""); }
 document.addEventListener("change",e=>{ if(e.target.dataset&&e.target.dataset.tl) setTimeout(kpiTL,0); });
 document.addEventListener("click",e=>{ if(e.target.closest('[data-tl="reset"]')){ S.tl=JSON.parse(JSON.stringify(P.tl||{start:"",ph:{}})); persist(); renderTL(); kpiTL(); } },true);
+const USP=()=>P.r&&P.r.some(r=>r[6]!=null);
 function render(){
-  const cols=P.c, isGP=id=>/^g[0-4]$/.test(id), inp=P.inp;
-  let h=`<thead><tr><th>Nr</th><th>Leistung</th>${P.art?"<th>Art</th>":""}${P.einheit?"<th>Einheit</th>":""}${P.menge?'<th class="n">Menge</th>':""}${cols.map(c=>`<th class="n">${esc(c[1])}</th>`).join("")}<th class="n us">${esc(P.refName)}</th><th class="n us">Unser Gesamtpreis</th>${inp?'<th class="n you">Ihr Preis €/E</th><th class="n you">Ihr Gesamtpreis</th><th class="n you">Abweichung</th>':""}</tr></thead><tbody>`;
-  const nc=2+(P.art?1:0)+(P.einheit?1:0)+(P.menge?1:0), extra=2+(inp?3:0);
+  const cols=P.c, isGP=id=>/^g[0-4]$/.test(id), inp=P.inp, us=USP();
+  let h=`<thead><tr><th>Nr</th><th>Leistung</th>${P.art?"<th>Art</th>":""}${P.einheit?"<th>Einheit</th>":""}${P.menge?'<th class="n">Menge</th>':""}${cols.map(c=>`<th class="n">${esc(c[1])}</th>`).join("")}${us?`<th class="n us">${esc(P.refName)}</th><th class="n us">Unser Gesamtpreis</th>`:""}${inp?`<th class="n you">Ihr Preis €/E</th><th class="n you">Ihr Gesamtpreis</th>${us?'<th class="n you">Abweichung</th>':""}<th class="you bm">Ihre Bemerkung</th>`:""}</tr></thead><tbody>`;
+  const nc=2+(P.art?1:0)+(P.einheit?1:0)+(P.menge?1:0), extra=(us?2:0)+(inp?(us?4:3):0);
   const sumC=(rs,j)=>rs.filter(r=>r[5]).reduce((a,r)=>a+(r[7+j]||0),0);
   P.o.forEach((g,gi)=>{ const rs=P.r.filter(r=>r[1]===gi); if(!rs.length) return;
     h+=`<tr class="gh" data-g="${gi}"><td>${String(gi+1).padStart(2,"0")}</td><td colspan="${nc-1+cols.length+extra}">${esc(g)}</td></tr>`;
     rs.forEach((r,k)=>{ const [i,,n,u,q,fest,rp]=r, vals=r.slice(7);
       h+=`<tr class="${fest?"":"opt"}" data-i="${i}" data-g="${gi}"><td style="color:var(--muted)">${gi+1}.${k+1}</td><td class="name">${esc(n)}</td>${P.art?`<td>${fest?"Fest":"Optional"}</td>`:""}${P.einheit?`<td>${esc(u)}</td>`:""}${P.menge?`<td class="n">${F2.format(q).replace(/,00$/,"")}</td>`:""}`+
          cols.map((c,j)=>`<td class="${c[0]==="note"?"":"n"}">${vals[j]==null?"":c[0]==="note"?esc(vals[j]):F2.format(vals[j])}</td>`).join("")+
-         `<td class="n us"><b>${F2.format(rp)}</b></td><td class="n us">${F2.format(R2(q*rp))}</td>`+
-         (inp?`<td class="n you"><input data-i="${i}" inputmode="decimal" value="${ST.p[i]!=null?F2.format(ST.p[i]):""}"></td><td class="n you" data-gp="${i}"></td><td class="n you" data-d="${i}"></td>`:"")+`</tr>`; });
-    h+=`<tr class="sub" data-g="${gi}"><td></td><td colspan="${nc-1}">Summe ${esc(g)} (nur Fest)</td>${cols.map((c,j)=>`<td class="n">${isGP(c[0])?F0.format(sumC(rs,j))+" €":""}</td>`).join("")}<td class="us"></td><td class="n us">${F0.format(rs.filter(r=>r[5]).reduce((a,r)=>a+R2(r[4]*r[6]),0))} €</td>${inp?`<td class="you"></td><td class="n you" data-sg="${gi}"></td><td class="n you" data-sd="${gi}"></td>`:""}</tr>`;
+         (us?`<td class="n us"><b>${F2.format(rp)}</b></td><td class="n us">${F2.format(R2(q*rp))}</td>`:"")+
+         (inp?`<td class="n you"><input data-i="${i}" inputmode="decimal" value="${ST.p[i]!=null?F2.format(ST.p[i]):""}"></td><td class="n you" data-gp="${i}"></td>${us?`<td class="n you" data-d="${i}"></td>`:""}<td class="you bm"><textarea data-bm="${i}" rows="1" placeholder="Bemerkung …">${esc((ST.b||{})[i]||"")}</textarea></td>`:"")+`</tr>`; });
+    h+=`<tr class="sub" data-g="${gi}"><td></td><td colspan="${nc-1}">Summe ${esc(g)} (nur Fest)</td>${cols.map((c,j)=>`<td class="n">${isGP(c[0])?F0.format(sumC(rs,j))+" €":""}</td>`).join("")}${us?`<td class="us"></td><td class="n us">${F0.format(rs.filter(r=>r[5]).reduce((a,r)=>a+R2(r[4]*r[6]),0))} €</td>`:""}${inp?`<td class="you"></td><td class="n you" data-sg="${gi}"></td>${us?`<td class="n you" data-sd="${gi}"></td>`:""}<td class="you"></td>`:""}</tr>`;
   });
-  h+=`<tr class="tot"><td></td><td colspan="${nc-1}">GESAMTSUMME netto (nur Fest)</td>${cols.map((c,j)=>`<td class="n">${isGP(c[0])?F0.format(sumC(P.r,j))+" €":""}</td>`).join("")}<td class="us"></td><td class="n us">${F0.format(P.r.filter(r=>r[5]).reduce((a,r)=>a+R2(r[4]*r[6]),0))} €</td>${inp?`<td class="you"></td><td class="n you" id="gt"></td><td class="n you" id="gd"></td>`:""}</tr>`;
+  h+=`<tr class="tot"><td></td><td colspan="${nc-1}">GESAMTSUMME netto (nur Fest)</td>${cols.map((c,j)=>`<td class="n">${isGP(c[0])?F0.format(sumC(P.r,j))+" €":""}</td>`).join("")}${us?`<td class="us"></td><td class="n us">${F0.format(P.r.filter(r=>r[5]).reduce((a,r)=>a+R2(r[4]*r[6]),0))} €</td>`:""}${inp?`<td class="you"></td><td class="n you" id="gt"></td>${us?'<td class="n you" id="gd"></td>':""}<td class="you"></td>`:""}</tr>`;
   document.getElementById("t").innerHTML=h+"</tbody>"; if(inp) upd(); applySearch();
 }
 const dpc=(a,b)=>b>0?(a/b-1):null, fdp=v=>v==null?"":(v>0?"+":"")+nf(1).format(v*100)+" %";
 function upd(){ let tot=0,ours=0,cnt=0,done=0; const sg={},so={};
   P.r.forEach(r=>{ const [i,gi,,,q,fest,rp]=r, p=ST.p[i], td=document.querySelector(`[data-gp="${i}"]`), dd=document.querySelector(`[data-d="${i}"]`);
-    if(p!=null){ done++; const gp=R2(q*p); td.textContent=F2.format(gp); const d=dpc(p,rp); dd.textContent=fdp(d); dd.className="n you "+(d>0.005?"up":d<-0.005?"down":"");
-      if(fest){ tot+=gp; ours+=R2(q*rp); sg[gi]=(sg[gi]||0)+gp; so[gi]=(so[gi]||0)+R2(q*rp); cnt++; } } else { td.textContent=""; dd.textContent=""; } });
-  document.querySelectorAll("[data-sg]").forEach(td=>{ const v=sg[td.dataset.sg]; td.textContent=v?F0.format(v)+" €":""; const d=document.querySelector(`[data-sd="${td.dataset.sg}"]`); d.textContent=v?fdp(dpc(v,so[td.dataset.sg])):""; });
-  document.getElementById("gt").textContent=cnt?F0.format(tot)+" €":""; document.getElementById("gd").textContent=cnt?fdp(dpc(tot,ours)):"";
-  const ky=document.getElementById("k_you"); if(ky){ ky.textContent=cnt?F0.format(tot)+" €":"–"; document.getElementById("k_you2").textContent=cnt?`${done} von ${P.r.length} Positionen · ${fdp(dpc(tot,ours))} zu unserem Preis`:"Noch keine Preise eingetragen"; }
-  const c=document.getElementById("cnt"); if(c) c.textContent=`${done} von ${P.r.length} Positionen ausgefüllt`+(cnt?` · Ihre Summe ${F0.format(tot)} € gegenüber unseren ${F0.format(ours)} € (gleiche Positionen)`:"");
+    if(p!=null){ done++; const gp=R2(q*p); td.textContent=F2.format(gp); const d=dpc(p,rp||0); if(dd){ dd.textContent=fdp(d); dd.className="n you "+(d>0.005?"up":d<-0.005?"down":""); }
+      if(fest){ tot+=gp; ours+=R2(q*rp); sg[gi]=(sg[gi]||0)+gp; so[gi]=(so[gi]||0)+R2(q*rp); cnt++; } } else { td.textContent=""; if(dd) dd.textContent=""; } });
+  document.querySelectorAll("[data-sg]").forEach(td=>{ const v=sg[td.dataset.sg]; td.textContent=v?F0.format(v)+" €":""; const d=document.querySelector(`[data-sd="${td.dataset.sg}"]`); if(d) d.textContent=v?fdp(dpc(v,so[td.dataset.sg])):""; });
+  document.getElementById("gt").textContent=cnt?F0.format(tot)+" €":""; const gd=document.getElementById("gd"); if(gd) gd.textContent=cnt?fdp(dpc(tot,ours)):"";
+  const ky=document.getElementById("k_you"); if(ky){ ky.textContent=cnt?F0.format(tot)+" €":"–"; document.getElementById("k_you2").textContent=cnt?`${done} von ${P.r.length} Positionen`+(USP()?` · ${fdp(dpc(tot,ours))} zu unserem Preis`:""):"Noch keine Preise eingetragen"; }
+  const c=document.getElementById("cnt"); if(c) c.textContent=`${done} von ${P.r.length} Positionen ausgefüllt`+(cnt?` · Ihre Summe ${F0.format(tot)} €`+(USP()?` gegenüber unseren ${F0.format(ours)} € (gleiche Positionen)`:""):"");
   persist(); }
 function applySearch(){ const t=(document.getElementById("q").value||"").trim().toLowerCase(), tb=document.querySelector("#t tbody"); if(!tb) return; const hit={};
   tb.querySelectorAll("tr[data-i]").forEach(tr=>{ const r=P.r.find(x=>x[0]===+tr.dataset.i); const ok=!t||(r[2]+" "+P.o[r[1]]).toLowerCase().includes(t); tr.classList.toggle("qhide",!ok); if(ok) hit[tr.dataset.g]=1; });
@@ -529,12 +533,13 @@ document.addEventListener("input",e=>{ if(e.target.id==="q"){ applySearch(); con
   if(e.target.id==="who"){ ST.who=e.target.value; persist(); } });
 document.addEventListener("change",e=>{ if(e.target.dataset.i!==undefined){ const v=ST.p[e.target.dataset.i]; e.target.value=v!=null?F2.format(v):""; } });
 document.addEventListener("keydown",e=>{ if(e.key==="Enter"&&e.target.tagName==="INPUT") e.target.blur(); });
+document.addEventListener("input",e=>{ const b=e.target.dataset&&e.target.dataset.bm; if(b===undefined) return; ST.b=ST.b||{}; ST.b[b]=e.target.value; e.target.style.height="auto"; e.target.style.height=e.target.scrollHeight+"px"; clearTimeout(window._bt); window._bt=setTimeout(persist,400); });
 function wire(){
   document.getElementById("who").value=ST.who||"";
-  document.getElementById("mk").onclick=async()=>{ const p=Object.entries(ST.p).map(([i,v])=>[+i,v]);
-    if(!p.length){ alert("Bitte zuerst mindestens einen Preis eintragen."); return; }
+  document.getElementById("mk").onclick=async()=>{ const p=Object.entries(ST.p).map(([i,v])=>[+i,v]), bm=Object.entries(ST.b||{}).filter(([i,v])=>v&&v.trim()).map(([i,v])=>[+i,v.trim()]);
+    if(!p.length&&!bm.length){ alert("Bitte zuerst mindestens einen Preis oder eine Bemerkung eintragen."); return; }
     if(!ST.who.trim()){ document.getElementById("who").focus(); alert("Bitte noch Ihren Namen oder Ihre Firma eintragen."); return; }
-    const url=location.href.split("#")[0].replace(/teilen\.html$/,"")+"#antwort="+await pack({v:1,n:ST.who.trim(),ts:new Date().toLocaleString("de-DE"),p});
+    const url=location.href.split("#")[0].replace(/teilen\.html$/,"")+"#antwort="+await pack({v:1,n:ST.who.trim(),ts:new Date().toLocaleString("de-DE"),p,b:bm});
     document.getElementById("rl").value=url; document.getElementById("reply").style.display="block";
     document.getElementById("mail").href="mailto:?subject="+encodeURIComponent("Preise Itzgrund 12 – "+ST.who.trim())+"&body="+encodeURIComponent("Hallo,\n\nhier meine Preise zur Leistungsliste Itzgrund 12:\n"+url+"\n\nViele Grüße\n"+ST.who.trim());
     document.getElementById("reply").scrollIntoView({behavior:"smooth"}); };
