@@ -473,7 +473,7 @@ function build(){
   if(sec.tl) h+=card("s_tl","G","Projektablauf",`<p class="dn" style="margin-top:0">Startdatum eintragen, alle Termine rechnen sich neu. Nur Arbeitstage Mo–Fr ohne Feiertage in Bayern.</p><div id="d_tl"></div>`);
   if(sec.liste) h+=card("s_liste","01","Leistungsliste"+(USP()&&P.inp?" mit Preisvergleich":P.inp?" zum Ausfüllen":""),(P.inp?`<div class="card hero" style="box-shadow:none;margin-bottom:16px"><div class="steps"><span><b>1</b>In der blauen Spalte Ihren Preis je Einheit eintragen, ganz rechts bei Bedarf eine Bemerkung</span><span><b>2</b>Name eintragen</span><span><b>3</b>Antwort-Link erstellen und an uns schicken</span></div>
       <div class="who" style="margin:0"><label>Ihr Name / Firma<input id="who" placeholder="z. B. Max Muster, Muster GmbH" autocomplete="organization"></label><div class="dn" id="cnt"></div></div></div>`:"")+
-      `<div class="tw"><table id="t"></table></div>`+(P.inp?`<div class="actions"><button class="pri" id="mk">Antwort-Link erstellen</button></div>`:`<div class="actions"></div>`),"flow");
+      `<div class="tw"><table id="t"></table></div>`+(P.inp?`<div class="actions"><button class="pri" id="mk">Antwort-Link erstellen</button><button id="x_save">Speichern</button><button id="x_pdf">PDF herunterladen</button><button id="x_xls">Excel herunterladen</button><button id="x_json">JSON herunterladen</button><button id="x_load">JSON laden</button><span class="dn" id="x_msg" style="align-self:center"></span></div>`:`<div class="actions"><button id="x_pdf">PDF herunterladen</button><button id="x_xls">Excel herunterladen</button><button id="x_json">JSON herunterladen</button><span class="dn" id="x_msg" style="align-self:center"></span></div>`),"flow");
   if(sec.liste&&P.inp) h+=`<div id="reply" class="card"><h2><i>02</i>Ihr Antwort-Link</h2><p>Bitte diesen Link an Achim Bau schicken. Er enthält nur Ihre eingetragenen Preise.</p><textarea readonly id="rl"></textarea><div class="actions" style="margin-top:0"><button class="pri" id="cp">Link kopieren</button><a class="btn" id="mail" href="#">Per E-Mail senden</a></div></div>`;
   if(sec.ueb&&P.ueb) h+=card("s_ueb","","Summen je Gewerk",barsH(P.ueb.map(([l,v])=>({l,v})).sort((a,b)=>b.v-a.v),{labelW:170})+`<p class="dn">${sec.ref==="bis"?"Preise inkl. Provision":"Unsere Preise"}, netto, nur Fest-Positionen.</p>`);
   const ch=[];
@@ -534,12 +534,52 @@ document.addEventListener("input",e=>{ if(e.target.id==="q"){ applySearch(); con
 document.addEventListener("change",e=>{ if(e.target.dataset.i!==undefined){ const v=ST.p[e.target.dataset.i]; e.target.value=v!=null?F2.format(v):""; } });
 document.addEventListener("keydown",e=>{ if(e.key==="Enter"&&e.target.tagName==="INPUT") e.target.blur(); });
 document.addEventListener("input",e=>{ const b=e.target.dataset&&e.target.dataset.bm; if(b===undefined) return; ST.b=ST.b||{}; ST.b[b]=e.target.value; e.target.style.height="auto"; e.target.style.height=e.target.scrollHeight+"px"; clearTimeout(window._bt); window._bt=setTimeout(persist,400); });
+// ---------- Speichern und Herunterladen (JSON, Excel, PDF) für den Empfänger
+const LIB=location.href.split("#")[0].replace(/[^/]*$/,"")+"lib/";
+function loadJs(f){ return new Promise((res,rej)=>{ if(document.querySelector(`script[data-lib="${f}"]`)) return res(); const s=document.createElement("script"); s.src=LIB+f; s.dataset.lib=f; s.onload=res; s.onerror=()=>rej(new Error(f)); document.head.appendChild(s); }); }
+const xName=ext=>("Preisabfrage_"+P.t+(ST.who.trim()?"_"+ST.who.trim():"")+"_"+new Date().toISOString().slice(0,10)).replace(/[^\wäöüÄÖÜß.-]+/g,"_")+"."+ext;
+function xMsg(m){ const e=document.getElementById("x_msg"); if(e) e.textContent=m; }
+function dl(name,blob){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); }
+function expRows(){ const us=USP(), head=["Nr","Leistung",...(P.einheit?["Einheit"]:[]),...(P.menge?["Menge"]:[]),...P.c.map(c=>c[1]),...(us?[P.refName,"Unser Gesamtpreis"]:[]),"Ihr Preis €/E","Ihr Gesamtpreis","Ihre Bemerkung"], body=[]; let tot=0;
+  P.o.forEach((g,gi)=>{ const rs=P.r.filter(r=>r[1]===gi); if(!rs.length) return; body.push({g:String(gi+1).padStart(2,"0")+" "+g}); let sg=0;
+    rs.forEach((r,k)=>{ const [i,,n,u,q,fest,rp]=r, p=ST.p[i], gp=p!=null?R2(q*p):null; if(fest&&gp) sg+=gp;
+      body.push({r:[`${gi+1}.${k+1}`,n+(fest?"":" (optional)"),...(P.einheit?[u]:[]),...(P.menge?[q]:[]),...r.slice(7),...(us?[rp,R2(q*rp)]:[]),p??null,gp,(ST.b||{})[i]||""]}); });
+    body.push({s:"Summe "+g+" (nur Fest)",v:R2(sg)}); tot+=sg; });
+  return {head,body,tot:R2(tot)}; }
+function xJson(){ const o={art:"Preisabfrage Achim Bau",projekt:P.t,ort:P.ort||"",name:ST.who,stand:new Date().toISOString(),link:P.lid||"",
+    positionen:P.r.map(r=>({id:r[0],gewerk:P.o[r[1]],leistung:r[2],einheit:r[3],menge:r[4],ihr_preis:ST.p[r[0]]??null,ihr_gesamtpreis:ST.p[r[0]]!=null?R2(r[4]*ST.p[r[0]]):null,bemerkung:(ST.b||{})[r[0]]||""})),p:ST.p,b:ST.b||{}};
+  dl(xName("json"),new Blob([JSON.stringify(o,null,1)],{type:"application/json"})); xMsg("JSON heruntergeladen."); }
+function xLoad(){ const i=document.createElement("input"); i.type="file"; i.accept=".json,application/json";
+  i.onchange=()=>{ const f=i.files[0]; if(!f) return; f.text().then(tx=>{ try{ const o=JSON.parse(tx); if(!o.p) throw 0; ST.p={}; Object.entries(o.p).forEach(([k,v])=>{ if(typeof v==="number") ST.p[k]=v; }); ST.b=o.b||{}; if(o.name) ST.who=o.name; persist(); render(); const w=document.getElementById("who"); if(w) w.value=ST.who; xMsg("Stand geladen."); }catch(e){ xMsg("Die Datei passt nicht zu dieser Preisabfrage."); } }); };
+  i.click(); }
+async function xXls(){ xMsg("Excel wird erstellt …"); try{ await loadJs("xlsx.full.min.js"); }catch(e){ xMsg("Excel konnte nicht geladen werden (Internet nötig)."); return; }
+  const {head,body,tot}=expRows(), aoa=[["Preisabfrage "+P.t+(P.ort?" · "+P.ort:"")],["Name / Firma: "+(ST.who||""),"","Stand: "+new Date().toLocaleDateString("de-DE")],[],head], nH=head.length, ip=head.indexOf("Ihr Preis €/E");
+  body.forEach(x=>{ if(x.g) aoa.push([x.g]); else if(x.r) aoa.push(x.r.map(v=>v==null?"":v)); else { const row=new Array(nH).fill(""); row[1]=x.s; row[ip+1]=x.v; aoa.push(row); } });
+  const tr=new Array(nH).fill(""); tr[1]="GESAMTSUMME netto (nur Fest)"; tr[ip+1]=tot; aoa.push([],tr);
+  const ws=XLSX.utils.aoa_to_sheet(aoa); Object.keys(ws).forEach(k=>{ if(k[0]!=="!"&&ws[k].t==="n") ws[k].z="#,##0.00"; });
+  ws["!cols"]=head.map(h=>({wch:h==="Leistung"?48:h==="Ihre Bemerkung"?44:h==="Nr"?6:14}));
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Preisabfrage"); XLSX.writeFile(wb,xName("xlsx")); xMsg("Excel heruntergeladen."); }
+async function xPdf(){ xMsg("PDF wird erstellt …"); try{ await loadJs("jspdf.umd.min.js"); await loadJs("jspdf.plugin.autotable.min.js"); }catch(e){ xMsg("PDF konnte nicht geladen werden (Internet nötig)."); return; }
+  const {jsPDF}=window.jspdf, doc=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"}), {head,body,tot}=expRows(), nH=head.length, ip=head.indexOf("Ihr Preis €/E");
+  const fmt=(v,h)=>v==null||v===""?"":typeof v==="number"?(h==="Menge"?F2.format(v).replace(/,00$/,""):F2.format(v)):String(v);
+  doc.setFillColor(179,38,30); doc.rect(14,12,9,9,"F"); doc.setFont("helvetica","bold"); doc.setFontSize(15); doc.setTextColor(29,42,38); doc.text("Preisabfrage "+P.t,27,19);
+  doc.setFont("helvetica","normal"); doc.setFontSize(9.5); doc.setTextColor(110,120,116); doc.text(`Achim Bau · ${P.ort||""} · netto, nur Lohn · Name / Firma: ${ST.who||"–"} · Stand ${new Date().toLocaleDateString("de-DE")}`,27,25);
+  const rows=[]; body.forEach(x=>{ if(x.g) rows.push([{content:x.g,colSpan:nH,styles:{fontStyle:"bold",fillColor:[243,248,245],textColor:[29,42,38]}}]);
+    else if(x.r) rows.push(x.r.map((v,j)=>fmt(v,head[j])));
+    else { const r=new Array(nH).fill(""); r[1]=x.s; r[ip+1]=F2.format(x.v)+" €"; rows.push(r.map(c=>({content:c,styles:{fontStyle:"bold",fillColor:[250,252,251]}}))); } });
+  const trw=new Array(nH).fill(""); trw[1]="GESAMTSUMME netto (nur Fest)"; trw[ip+1]=F2.format(tot)+" €"; rows.push(trw.map(c=>({content:c,styles:{fontStyle:"bold",fillColor:[229,240,235]}})));
+  const cs={}; head.forEach((h,j)=>{ cs[j]=h==="Leistung"?{cellWidth:70}:h==="Ihre Bemerkung"?{cellWidth:62}:h==="Nr"?{cellWidth:10}:{halign:"right"}; if(h==="Einheit") cs[j]={halign:"center"}; });
+  doc.autoTable({head:[head],body:rows,startY:31,theme:"plain",styles:{font:"helvetica",fontSize:8,cellPadding:1.6,textColor:[29,42,38],lineColor:[229,236,232],lineWidth:{bottom:.2}},
+    headStyles:{fontStyle:"bold",textColor:[95,111,105],lineColor:[29,42,38],lineWidth:{bottom:.4}},columnStyles:cs,margin:{left:14,right:14,top:16,bottom:14},
+    didDrawPage:d=>{ doc.setFontSize(8); doc.setTextColor(140,150,146); doc.text("Achim Bau · Preisabfrage "+P.t,14,doc.internal.pageSize.getHeight()-7); doc.text("Seite "+doc.internal.getNumberOfPages(),doc.internal.pageSize.getWidth()-14,doc.internal.pageSize.getHeight()-7,{align:"right"}); }});
+  doc.save(xName("pdf")); xMsg("PDF heruntergeladen."); }
+document.addEventListener("click",e=>{ const id=e.target.id; if(id==="x_json") xJson(); else if(id==="x_load") xLoad(); else if(id==="x_xls") xXls(); else if(id==="x_pdf") xPdf(); else if(id==="x_save"){ persist(); xMsg("Gespeichert. Ihre Eingaben bleiben in diesem Browser."); } });
 function wire(){
   document.getElementById("who").value=ST.who||"";
   document.getElementById("mk").onclick=async()=>{ const p=Object.entries(ST.p).map(([i,v])=>[+i,v]), bm=Object.entries(ST.b||{}).filter(([i,v])=>v&&v.trim()).map(([i,v])=>[+i,v.trim()]);
     if(!p.length&&!bm.length){ alert("Bitte zuerst mindestens einen Preis oder eine Bemerkung eintragen."); return; }
     if(!ST.who.trim()){ document.getElementById("who").focus(); alert("Bitte noch Ihren Namen oder Ihre Firma eintragen."); return; }
-    const url=location.href.split("#")[0].replace(/teilen\.html$/,"")+"#antwort="+await pack({v:1,n:ST.who.trim(),ts:new Date().toLocaleString("de-DE"),p,b:bm});
+    const url=location.href.split("#")[0].replace(/teilen\.html$/,"")+"#antwort="+await pack({v:1,n:ST.who.trim(),ts:new Date().toLocaleString("de-DE"),p,b:bm,lid:P.lid||""});
     document.getElementById("rl").value=url; document.getElementById("reply").style.display="block";
     document.getElementById("mail").href="mailto:?subject="+encodeURIComponent("Preise Itzgrund 12 – "+ST.who.trim())+"&body="+encodeURIComponent("Hallo,\n\nhier meine Preise zur Leistungsliste Itzgrund 12:\n"+url+"\n\nViele Grüße\n"+ST.who.trim());
     document.getElementById("reply").scrollIntoView({behavior:"smooth"}); };
